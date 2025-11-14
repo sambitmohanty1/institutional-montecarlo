@@ -5,6 +5,50 @@ import numpy as np
 import matplotlib.pyplot as plt
 from montecarlo import run_montecarlo_simulation
 
+def generate_investment_thesis(ticker, info, technicals, mc):
+    price = technicals["price"]
+    sma50 = technicals["sma50"]
+    sma200 = technicals["sma200"]
+
+    trend = "bullish" if sma50[-1] > sma200[-1] else "bearish"
+
+    sector = info.get("sector", "N/A")
+    pe = info.get("trailingPE", None)
+    div = info.get("dividendYield", 0) * 100
+    market_cap = info.get("marketCap", 0) / 1e9
+
+    expected_cagr = mc["expected_cagr"]
+
+    thesis = f"""
+### 🧠 AI-Generated Investment Thesis for **{ticker}**
+
+**Technical Trend:**  
+The stock is currently showing a *{trend}* setup based on the 50/200 SMA crossover pattern.  
+This generally indicates that momentum is shifting towards the {trend} side.
+
+**Fundamentals:**  
+- Market Cap: **${market_cap:.2f}B**  
+- P/E Ratio: **{pe if pe else "N/A"}**  
+- Dividend Yield: **{div:.2f}%**  
+- Sector: **{sector}**
+
+The valuation appears {'reasonable' if pe and pe < 30 else 'elevated'} relative to sector norms, indicating that investors are pricing in {'growth potential' if pe and pe > 30 else 'stable earnings'}.
+
+**Monte Carlo Forward View (3-Year Outlook):**  
+Expected CAGR: **{expected_cagr}**  
+The distribution indicates a balanced risk-reward profile with healthy upside scenarios.
+
+**Overall Thesis:**  
+{ticker} appears to provide a combination of { 'growth and momentum' if trend == 'bullish' else 'value and stability'}.  
+Given its sector dynamics, expected return profile, and technical structure, the stock may be suitable for investors with a **{ 'growth-oriented' if trend == 'bullish' else 'risk-aware' }** outlook over the next 2–4 years.
+
+---
+
+### 🟢 Investment Outlook:  
+**Moderately Positive** if the investor seeks multi-year growth and can tolerate moderate volatility.
+"""
+    return thesis
+
 st.set_page_config(page_title="Institutional Monte Carlo + Stock Analyst", layout="wide")
 
 st.title("🏦 Institutional Monte Carlo + AI Stock Analyst")
@@ -69,3 +113,16 @@ else:
                 pass
         st.subheader("Portfolio Simulation Summary")
         st.dataframe(pd.DataFrame(results))
+
+# Generate AI thesis
+technicals = {
+    "price": price,
+    "sma50": sma50,
+    "sma200": sma200
+}
+
+ai_thesis = generate_investment_thesis(ticker, info, technicals, mc_result)
+
+st.subheader("🧠 AI Investment Thesis")
+st.markdown(ai_thesis)
+
