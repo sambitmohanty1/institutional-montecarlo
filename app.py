@@ -166,6 +166,7 @@ if mode == "Single Stock":
 else:
     st.header("Portfolio Monte Carlo (Correlated)")
 
-    st.markdown("---")
+    st.markdown("""
 Upload a CSV file containing:
+    """)
 
