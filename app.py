@@ -145,4 +145,27 @@ if mode == "Single Stock":
                 years = st.slider("Projection horizon (years)", 1, 10, 3)
                 sims = st.slider("Simulations", 500, 5000, 2000, step=500)
 
-                mc = run_mon_
+                mc = run_montecarlo_simulation(ticker, years, sims)
+                st.pyplot(mc["plot"])
+                st.write(f"**Expected CAGR:** {mc['expected_cagr']}")
+                st.write("**Percentiles:**", mc["percentiles"])
+
+                # AI thesis
+                st.subheader("AI Investment Thesis")
+                technicals = {"price": price, "sma50": sma50, "sma200": sma200}
+                thesis = generate_investment_thesis(ticker, info, technicals, mc)
+                st.markdown(thesis)
+
+            except Exception as e:
+                st.error(f"Error: {e}")
+
+
+# ============================
+#  PORTFOLIO MODE
+# ============================
+else:
+    st.header("Portfolio Monte Carlo (Correlated)")
+
+    st.markdown("""
+Upload a CSV file containing:
+
